@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: creative
+      POSTGRES_PASSWORD: creative
+      POSTGRES_DB: creative_client_os
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - creative_pg:/var/lib/postgresql/data
+
+volumes:
+  creative_pg:

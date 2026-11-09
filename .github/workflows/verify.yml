@@ -1,0 +1,31 @@
+name: Verify
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: creative
+          POSTGRES_PASSWORD: creative
+          POSTGRES_DB: creative_client_os
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U creative -d creative_client_os"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: cp .env.example .env
+      - run: npm run db:setup
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
